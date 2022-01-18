@@ -29,13 +29,9 @@ The ultimate goal of this project is to build a model that predicts the tax valu
 
 ## Initial Questions
 
-- Are larger homes valued higher?  
+- Do certain leases get approval faster? Or in certain counties/districts/shales?
+- What's the relation between well depth and shale/county/district?  Approval time? Output?
 
-- What other aspects can be identified about higher-value homes?
-
-- Do more bathrooms relate to higher tax value? What about square feet per bathroom--is there a sweet spot?
-
-- Newer homes are larger; they are also valued more highly. Is there an exception to the rule?
 
 
 ##  Steps to Reproduce
