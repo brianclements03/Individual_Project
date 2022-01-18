@@ -17,3 +17,21 @@ def acquire_permits():
                 .append(permits_2019_2).append(permits_2020).append(permits_2021_1)\
                 .append(permits_2021_2)
     return permits
+
+
+
+def prep_permits(df):
+    df.rename(columns = {'Status Date':'Status_Date','Status #':"Status_#" 
+                           ,"API NO.":'API_NO.'
+                           ,'Operator Name/Number':'Operator_Name/Number'
+                           ,'Lease Name':'Lease_Name','Well #':'Well_#','Dist.':'District'
+                           ,'Wellbore Profile':'Wellbore_Profile'
+                           ,'Filing Purpose':'Filing_Purpose','Total Depth':'Total_Depth'
+                           ,'Stacked Lateral Parent Well DP #':'Stacked_Lateral_Parent_Well_DP_#'
+                           ,'Current Queue':'Current_Queue'})
+    x = df["Status Date"].str.replace("Submitted", "").str.replace("Approved", "")
+    x = x.str.split(n=2, expand=True)
+    df["Permit_submitted"] = x[0]
+    df["Permit_approved"] = x[1]
+
+    return df
