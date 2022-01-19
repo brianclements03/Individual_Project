@@ -1,4 +1,3 @@
-from this import d
 import pandas as pd
 import numpy as np
 
@@ -29,12 +28,20 @@ def prep_permits(permits):
     permits["Permit_approved"] = x[1]
     permits.Permit_submitted = pd.to_datetime(permits.Permit_submitted)
     permits.Permit_approved = pd.to_datetime(permits.Permit_approved)
-    permits['Approval_time'] = permits.Permit_approved - permits.Permit_submitted
+    permits['Approval_time_days'] = (permits.Permit_approved - permits.Permit_submitted).astype(str)
+    # 
+    x = permits['Approval_time_days'].str.split(n=2, expand=True)
+    permits["Approval_time_days"] = x[0].astype(int)
+    # 
     shales = pd.read_excel('tx_shales_and_counties.xlsx')
     permits = permits.merge(shales, how='left', left_on='County', right_on='COUNTY')
     permits = permits.drop(columns = 'COUNTY')
     permits = permits.rename(columns = {'SHALE PLAY':'SHALE'})
     permits = permits.set_index('Permit_approved').sort_index()
+    permits = permits.drop(columns = 'Stacked_Lateral_Parent_Well_DP')
+    permits = permits.dropna()
+
+
 
     return permits
 
