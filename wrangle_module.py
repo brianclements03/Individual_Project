@@ -22,7 +22,7 @@ def acquire_permits():
 
 
 def prep_permits(permits):
-    permits = permits.rename(columns = {'Status Date':'Status_Date',"Status #":"Status_#","API NO.":'API_NO.','Operator Name/Number':'Operator_Name/Number','Lease Name':'Lease_Name','Well #':'Well_#','Dist.':'District','Wellbore Profile':'Wellbore_Profile','Filing Purpose':'Filing_Purpose','Total Depth':'Total_Depth','Stacked Lateral Parent Well DP #':'Stacked_Lateral_Parent_Well_DP_#','Current Queue':'Current_Queue'})
+    permits = permits.rename(columns = {'Status Date':'Status_Date',"Status #":"Status","API NO.":'API_NO.','Operator Name/Number':'Operator_Name_Number','Lease Name':'Lease_Name','Well #':'Well','Dist.':'District','Wellbore Profile':'Wellbore_Profile','Filing Purpose':'Filing_Purpose','Total Depth':'Total_Depth','Stacked Lateral Parent Well DP #':'Stacked_Lateral_Parent_Well_DP','Current Queue':'Current_Queue'})
     x = permits["Status_Date"].str.replace("Submitted", "").str.replace("Approved", "")
     x = x.str.split(n=2, expand=True)
     permits["Permit_submitted"] = x[0]

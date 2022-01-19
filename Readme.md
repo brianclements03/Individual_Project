@@ -6,6 +6,10 @@
 ## This file/repo contains information related to my Texas Drilling Permits project, using 2016-2021 oil and gas drilling permits for the State of Texas
 ## These permit databases are available for download from the Texas Railroad Commision website, http://webapps2.rrc.texas.gov/EWA/ewaMain.do
 
+## Executive Summary
+
+
+
 ## Project Description
 
 This Jupyter Notebook and presentation explore public records relating to oil and gas permitting in the State of Texas. The data used include all of the permits that were approved from the beginning of 2016 to the end of 2021.  Apart from a general exploration of the data and potential relationships, the hope is to make a predictive model on one or more continuous variables, such as well depth, type of bore, and particularly, the amount of time a permit is approved.
@@ -15,9 +19,13 @@ I will use Residual Mean Square Error as my metric for evaluation; many models w
 Additionally, a Jupyter Notebook with my main findings and conclusions will be a key deliverable; many .py files will exist as a back-up to the main Notebook (think "under-the-hood" coding that will facilitate the presentation).
 
 
-## The Plan
+## Project Planning
 
 The intention of this project is to follow the data science pipeline by acquiring and wrangling the relevant information from the Railroad Commission website, which is availabe for download is .csv format.  Many files were downloaded and appended to one another to creat the final dataframe that the notebook is based on.  From here, a suitable exploration of the variable will be undertaken and presented, including graphical representations and modeling.  
+
+## Trello
+
+
 
 ## Project Goals
 
