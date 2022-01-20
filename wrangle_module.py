@@ -110,8 +110,8 @@ def encode_permits(df):
     '''
     # ordinal encoder? sklearn.OrdinalEncoder
 
-    cols_to_dummy = df['SHALE']
-    dummy_df = pd.get_dummies(cols_to_dummy, dummy_na=False, drop_first=False)
+    cols_to_dummy = ['SHALE','District']
+    dummy_df = pd.get_dummies(df[cols_to_dummy], dummy_na=False, drop_first=False)
     df = pd.concat([df, dummy_df], axis = 1)
     #df.columns = df.columns.astype(str)
     # I ended up renaming counties in an above function; the other encoded cols are renamed here:

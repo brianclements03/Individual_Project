@@ -84,6 +84,7 @@ The following is a brief list of items that I'd like to add to the model:
 - Different models, time series or regression (Also: Do splitting based on the the modelling done--time series or regression)
 - Remove 'outlier' counties, those with a number of permits below 1.5 the IQR (only a handful of permit approvals per year/or during the whole time frame)
 - Are there predictive clusters to consider? (Besides shale formation?)
+- Add feature selection
 
 
 
