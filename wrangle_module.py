@@ -1,5 +1,11 @@
 import pandas as pd
 import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.impute import SimpleImputer
+import sklearn.preprocessing
+
+
+
 
 def acquire_permits():
     permits_2016 = pd.read_csv('DrillingPermitResults_2016.csv',sep=',')
@@ -114,6 +120,57 @@ def split_permits(df):
     return train, validate, test, X_train, y_train, X_validate, y_validate, X_test, y_test
 
 
+def encode_permits(df):
+    '''
+    This is encoding a few of the permit columns for later modelling; it drops the original column 
+    once it has been encoded
+    
+    '''
+    # ordinal encoder? sklearn.OrdinalEncoder
+
+    cols_to_dummy = df['SHALE']
+    dummy_df = pd.get_dummies(cols_to_dummy, dummy_na=False, drop_first=False)
+    df = pd.concat([df, dummy_df], axis = 1)
+    #df.columns = df.columns.astype(str)
+    # I ended up renaming counties in an above function; the other encoded cols are renamed here:
+    #df.rename(columns={'6037.0':'LA', '6059.0': 'Orange', '6111.0':'Ventura'}, inplace=True)
+    # I have commented out the following code bc i think i might want to have the county column for exploration
+    #df = df.drop(columns='county')
+    return df
+
+def scale_permits(train, validate, test):
+    '''
+    Takes in the permits dataframe and returns SCALED train, validate, test subset dataframes
+    '''
+    # SCALE
+    # 1. create the object
+    scaler = sklearn.preprocessing.MinMaxScaler()
+    # 2. fit the object
+    scaler.fit(train[['Total_Depth', 'Approval_time_days']])
+    # 3. use the object. Scale all columns for now
+    train_scaled =  scaler.transform(train[['Total_Depth', 'Approval_time_days']])
+    train_scaled = pd.DataFrame(train_scaled, columns=['Total_Depth', 'Approval_time_days'])
+
+    validate_scaled =  scaler.transform(validate[['Total_Depth', 'Approval_time_days']])
+    validate_scaled = pd.DataFrame(validate_scaled, columns=['Total_Depth', 'Approval_time_days'])
+
+    test_scaled =  scaler.transform(test[['Total_Depth', 'Approval_time_days']])
+    test_scaled = pd.DataFrame(test_scaled, columns=['Total_Depth', 'Approval_time_days'])
+
+    # 4. Divide into x/y
+
+    X_train_scaled = train_scaled.drop(columns=['Approval_time_days'])
+    y_train_scaled = pd.DataFrame(train_scaled.Approval_time_days, columns=['Approval_time_days'])
+
+    X_validate_scaled = validate_scaled.drop(columns=['Approval_time_days'])
+    y_validate_scaled = pd.DataFrame(validate_scaled.Approval_time_days, columns=['Approval_time_days'])
+
+    X_test_scaled = test_scaled.drop(columns=['Approval_time_days'])
+    y_test_scaled = pd.DataFrame(test_scaled.Approval_time_days, columns=['Approval_time_days'])
+
+    return train_scaled, X_train_scaled, y_train_scaled, validate_scaled, X_validate_scaled, y_validate_scaled, test_scaled, X_test_scaled, y_test_scaled
+
+
 def wrangle_df():
     # write code to check for an existing csv first
     df = acquire_permits()
@@ -121,5 +178,12 @@ def wrangle_df():
     # 
     df = remove_outliers(df, 1.5, ['Approval_time_days'])
     # 
-    pd.to_csv(df)
-    return df
+    train, validate, test, X_train, y_train, X_validate, y_validate, X_test, y_test = split_permits(df)
+    # 
+    df = encode_permits(df)
+    # 
+    df = scale_permits(train,validate,test)
+    # 
+    train_scaled, X_train_scaled, y_train_scaled, validate_scaled, X_validate_scaled, y_validate_scaled, test_scaled, X_test_scaled, y_test_scaled = scale_permits(train,validate,test)
+    # df.to_csv(df)
+    return df, train, validate, test, X_train, y_train, X_validate, y_validate, X_test, y_test, train_scaled, X_train_scaled, y_train_scaled, validate_scaled, X_validate_scaled, y_validate_scaled, test_scaled, X_test_scaled, y_test_scaled
