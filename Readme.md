@@ -11,7 +11,13 @@
 
 ## Executive Summary
 
+All oil and gas drilling in the State of Texas is regulated by the Texas Railroad Commission (TRRC); in the name of transparency and equitable, speedy, and efficient public service, it's important that this body be held accountable to its responsibilities.  
 
+This study has done an exhaustive exploration of public data relating to permitting done by the TRRC, and has found that permitting is generally being done quickly across all of the TRRC's districts; in all the counties of the state; and in all the shale formations, with few exceptions.
+
+The study has gone as far as to build a machine learning regression model in an attempt to predict the approval time for permits; while the model was able to beat the baseline prediction by a very modest 6/10ths of 1 percent, it served mainly to drive home the point that the TRRC drilling permit times are roughly the same, no matter how one looks at the data.
+
+To put it another way: "there isn't much to see here."
 
 ## Project Description
 
@@ -24,15 +30,16 @@ Additionally, a Jupyter Notebook with my main findings and conclusions will be a
 
 ## Project Planning
 
-The intention of this project is to follow the data science pipeline by acquiring and wrangling the relevant information from the Railroad Commission website, which is availabe for download is .csv format.  Many files were downloaded and appended to one another to creat the final dataframe that the notebook is based on.  From here, a suitable exploration of the variable will be undertaken and presented, including graphical representations and modeling.  
+The intention of this project is to follow the data science pipeline by acquiring and wrangling the relevant information from the Railroad Commission website, which is availabe for download is .csv format.  Many files were downloaded and appended to one another to creat the final dataframe that the notebook is based on.  From here, a suitable cleaning/preparation was undertaken, leading to an exploration of the variables , including graphical representations and modeling.  
 
 ## Trello
 
-
+The following link is for the trello board I used for the organization of this project.
+https://trello.com/b/cDu1voQa
 
 ## Project Goals
 
-The ultimate goal of this project is to build a model that predicts amount of time a permit takes to be approved; however, there is considerable doubt as to the value of such a model, and this goal may shift as my data exploration evolves.
+The ultimate goal of this project is to build a model that predicts amount of time a permit takes to be approved; however, there is considerable doubt as to the potential predictive power of such a model, and this goal may shift as my data exploration evolves.
 
 ## Initial Questions
 
@@ -135,11 +142,15 @@ To sum it up: this analysis has been able to clearly demonstrate that, based on 
 
 ## Recommendations
 
-This project began in the hopes of being able to link permitting and production; this goal remains elusive, due to the structure of the data available for public download at the Texas Railroad Commision website.  However, the foremost recommendation is to continue studying ways to scrape production information in order to tie it to the permitting and producer information that is so easily available, and build on the models in this report to include a predictive model for well output based on features such as shale, depth, geography, etc.  
+For the consumer of this report, the principal actionable recommendation is to continue to keep a finger on the pulse of the TRRC's work.  It seems clear from this study that this governmental body is doing a great job when it comes to drilling permits, but the public's access to information is what allows us to make sure of it.  
 
-At the very least, finding a handfull of new continuous variables to include in the anaysis could reap benefits, since the modeling in this report relies almost exclusively on categorical variables, some of which have sparse observations to model on.  This could also increase the possibility of running some feature selection and clustering.  Clustering, in particular, was not helpful in this study--apart from all the districts already being related geographically to the areas they serve (which naturally includes the shale formation, roughly), there is only the one continuous variable to attempt to utilize for a clustering model.  
+In the same vein, other aspects of Texas's oil output could be presented in an easier-to-analyze fashion.  As it stands, it is difficult to do an analysis of output on a very detailed level, particularly to tie new permits to their subsequent oil and gas production (summary statistics are in fact available on the TRRC website, but are broken down to a higher level than this data science study sought).  
 
 ## Next steps
+
+This project began in the hopes of being able to link permitting and production; this goal remains elusive, due to the structure of the data available for public download at the Texas Railroad Commision website.  However, the foremost recommendation is to continue studying ways to scrape production information in order to tie it to the permitting and producer information that is so easily available, and build on the models in this report to include a predictive model for well output based on features such as shale, depth, geography, etc.  
+
+At the very least, finding a handfull of new continuous variables to include in the anaysis could reap benefits, since the modeling in this report relies almost exclusively on categorical variables, some of which have sparse observations to model on.  This could also increase the possibility of running some feature selection and clustering.  Clustering, in particular, was not helpful in this study--apart from all the districts already being related geographically to the areas they serve (which naturally includes the shale formation, roughly), there is only the one continuous variable to attempt to utilize for a clustering model. 
 
 - The main next step is to continue to work on building the data up from publicly available information on the Railroad Commission website, especially information on production and geography (i.e. well latitude/longitude), items that are easily downloaded but very difficult to tie to the current database.  
 
