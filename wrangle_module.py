@@ -66,7 +66,8 @@ def prep_permits(df):
     df = df.drop(columns = 'COUNTY')
     df = df.rename(columns = {'SHALE PLAY':'SHALE'})
     df = df.set_index('Permit_approved').sort_index()
-    df = df.drop(columns = 'Stacked_Lateral_Parent_Well_DP')
+    # 
+    df = df.drop(columns = ['Stacked_Lateral_Parent_Well_DP','Status_Date', 'Status'])
     df['Depth_bin']=pd.qcut(df.Total_Depth,3,labels=['Shallow','Mid_depth','Deep'])
     df = remove_outliers(df,1.5,['Approval_time_days'])
     df = df.dropna()

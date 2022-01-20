@@ -1,6 +1,9 @@
 # INDIVIDUAL PROJECT
 
+# TEXAS RAILROAD COMMISION DRILLING PERMIT APPROVAL TIMES
 
+## Brian Clements
+## 24 January 2022
 
 
 ## This file/repo contains information related to my Texas Drilling Permits project, using 2016-2021 oil and gas drilling permits for the State of Texas
@@ -42,50 +45,109 @@ The ultimate goal of this project is to build a model that predicts amount of ti
 
 In  the case of this project, the first step is to download the pertinent .csv files (with the correct parameters); from here, I have created several python files that can be used to aggregate, clean, prepare and otherwise manipulate the data in advance of exploration, feature selection, and modeling (listed below).
 
-I split the data into X_train and y_train data sets for much of the exploration and modelling, and was cognizant of the independence of the target variable from other variables in the dataset.  I added a couple of features of my own, including time to approval, and dropped rows with null values (my final dataset was _____ rows long, from 52,442 that were initially aggregated from the RRC csv files)
+I split the data into X_train and y_train data sets for much of the exploration and modelling, and was cognizant of the independence of the target variable from other variables in the dataset.  I added a couple of features of my own, including time to approval, and dropped rows with null values.
 
-Once the data is correctly prepared, it can be run through the sklearn preprocessing feature for polynomial regressiong and fit on the scaled X_train dataset, using only those features indicated from the recursive polynomial engineering feature selector (also an sklearn function).  This provided me with the best results for the purposes of my project.
+Once the data is correctly prepared, it can be run through the sklearn preprocessing feature for polynomial regressiong and fit on the scaled X_train dataset.  This provided me with the best results for the purposes of my project.
 
 LIST OF MODULES USED IN THE PROJECT, FOUND IN THE PROJECT DIRECTORY:
 -- wrangle_module.py: for acquiring, cleaning, encoding, splitting and scaling the data.  
-<!-- -- viz.py: used for creating several graphics for my final presentation
 -- model.py: many, many different versions of the data were used in different feature selection and modeling algorithms; this module is helpful for splitting them up neatly.
--- feature_engineering.py: contains functions to help choose the 'best' features using certain sklearn functions  -->
+
 
 ## Data Dictionary
 
 Variable	Meaning
 ___________________
-- 
+- 'API_NO.' : American Petroleum Institute unique well number
+- 'Operator_Name_Number' : Well operator's name and number
+- 'Lease_Name' : Lease name
+- 'Well' : Well number
+- 'District' : District the well belongs to
+- 'County' : County the well belongs to
+- 'Wellbore_Profile' : Type of bore
+- 'Filing_Purpose' : Purpose for filing
+- 'Amend' : Was the filing amended?
+- 'Total_Depth' : Total well depth
+- 'Current_Queue' : Has the permit been approved? (they all have in this data)
+- 'Permit_submitted' : Date the permit was submitted for approval
+- 'Approval_time_days' : Number of days it took to approve the permit
+- 'SHALE' : What shale formation the permit is for
+- 'Depth_bin' : Bins (Deep, Middle, and Shallow) for the total well depth
+- 'SHALE_BARNETT': Encoded feature for shale
+- 'SHALE_EAGLE FORD' : Encoded feature for shale
+- 'SHALE_HAYNESVILLE' : Encoded feature for shale
+- 'SHALE_NONE' : Encoded feature for shale
+- 'SHALE_PERMIAN BASIN' : Encoded feature for shale
+- 'District_01' : Encoded feature for district
+- 'District_02' : Encoded feature for district
+- 'District_03' : Encoded feature for district
+- 'District_04' : Encoded feature for district
+- 'District_05' : Encoded feature for district
+- 'District_06' : Encoded feature for district
+- 'District_08' : Encoded feature for district
+- 'District_09' : Encoded feature for district
+- 'District_10' : Encoded feature for district
+- 'District_7B' : Encoded feature for district
+- 'District_7C' : Encoded feature for district
+- 'District_8A' : Encoded feature for district
+- 'Depth_scaled' : Scaled depth
 
 Variables created in the notebook (explanation where it helps for clarity):
 
--
+- permits : the main dataframe created, containing all observations
+- train : a split of permits
+- validate : a split of permits
+- test : a split of permits
+- X_train : X split of train
+- y_train : y split of train
+- X_validate : X split of validate
+- y_validate : y split of validate
+- X_test : X split of test
+- y_test : y split of test
+- train_scaled : train with scaled continuous attributes
+- X_train_scaled : X_train with scaled attributes
+<!-- - y_train_scaled -->
+- validate_scaled : validate with scaled continuous attributes
+- X_validate_scaled : X_validate with scaled attributes
+<!-- - y_validate_scaled -->
+- test_scaled : test with scaled continuous attributes
+- X_test_scaled : X_test with scaled attributes
+<!-- - y_test_scaled -->
+- disc_vars : discrete variable
+- temp : temporary dataframe
+- quick_counties : list of counties that approve permits quickly
+- slow_counties: list of counties that approve permits more slowly
+- alpha : the confidence level used in stats testing
+- shales : list of shale formations
+- f, p = values created for statistical analysis purposes
 
 Missing values: 
 
+There number of rows missing vaules were in reality only a small handful, and were therefore dropped.  The final database analyzed has 67,355 rows (which is down from 76899 in an unmanipulated version of the dataframe--this includes a few outliers that were also truncated).
+
 ## Key findings, recommendations and takeaways
     
+As has been demonstrated once and again, the dataset that I have built from data available on the Railroad Commision's drilling permit query tool is maddeningly limited in its predictive ability vis-a-vis the target variable. To put it another way: when it comes to oil, the State of Texas does a great job of getting permits approved quickly, efficiently, and from the looks of it, equitably.
 
+I was able to conduct an interesting exploration of the data to get an idea of what kinds of wells are being permitted (the vast majority are new wells); which districts, shales, and counties have the highest number of permits; and, to an extent, the relationship between well depth and permitting time.  To reiterate, none of these exploratory analyses resulted in terribly unexpected outcomes, but it was interesting to get an idea of how they were interrelated, and to confirm the lack of correlation.  
+
+To sum it up: this analysis has been able to clearly demonstrate that, based on the variable readily available in the dataset, drilling permitting is taking place quickly and evenly across jurisdictions and geographies in Texas.
 
 ## Recommendations
 
+This project began in the hopes of being able to link permitting and production; this goal remains elusive, due to the structure of the data available for public download at the Texas Railroad Commision website.  However, the foremost recommendation is to continue studying ways to scrape production information in order to tie it to the permitting and producer information that is so easily available, and build on the models in this report to include a predictive model for well output based on features such as shale, depth, geography, etc.  
 
+At the very least, finding a handfull of new continuous variables to include in the anaysis could reap benefits, since the modeling in this report relies almost exclusively on categorical variables, some of which have sparse observations to model on.  This could also increase the possibility of running some feature selection and clustering.  Clustering, in particular, was not helpful in this study--apart from all the districts already being related geographically to the areas they serve (which naturally includes the shale formation, roughly), there is only the one continuous variable to attempt to utilize for a clustering model.  
 
 ## Next steps
 
+- The main next step is to continue to work on building the data up from publicly available information on the Railroad Commission website, especially information on production and geography (i.e. well latitude/longitude), items that are easily downloaded but very difficult to tie to the current database.  
 
-
-The following is a brief list of items that I'd like to add to the model:
+Apart from the above, the following is a brief list of items that I'd like to add to future iterations of the study:
 
 - Aggregate different lease/company names where they area obscured by sub-companies
-- Continue attempts to include production information in the permits dataframe
-- Pull in geographical data (lat/long) to be able to map the wells
-- Different models, time series or regression (Also: Do splitting based on the the modelling done--time series or regression)
-- Remove 'outlier' counties, those with a number of permits below 1.5 the IQR (only a handful of permit approvals per year/or during the whole time frame)
-- Are there predictive clusters to consider? (Besides shale formation?)
-- Add feature selection
-
-
+- Split and model based on time series analysis
+- Remove those counties and districts with particularly few observations
+- Run a feature selection algorithm
 
 

@@ -41,15 +41,15 @@ def create_data_for_models(X_train_scaled, X_validate_scaled, X_test_scaled):
     single continuous feature in the data set.
     
     '''
-    X_train_model = X_train_scaled.drop(columns = ['Status_Date', 'Status', 'API_NO.', 'Operator_Name_Number',
+    X_train_model = X_train_scaled.drop(columns = ['API_NO.', 'Operator_Name_Number',
        'Lease_Name', 'Well', 'District', 'County', 'Wellbore_Profile',
        'Filing_Purpose', 'Amend', 'Current_Queue', 'Permit_submitted', 'SHALE',
        'Depth_bin'])
-    X_validate_model = X_validate_scaled.drop(columns = ['Status_Date', 'Status', 'API_NO.', 'Operator_Name_Number',
+    X_validate_model = X_validate_scaled.drop(columns = ['API_NO.', 'Operator_Name_Number',
        'Lease_Name', 'Well', 'District', 'County', 'Wellbore_Profile',
        'Filing_Purpose', 'Amend', 'Current_Queue', 'Permit_submitted', 'SHALE',
        'Depth_bin'])
-    X_test_model = X_test_scaled.drop(columns = ['Status_Date', 'Status', 'API_NO.', 'Operator_Name_Number',
+    X_test_model = X_test_scaled.drop(columns = ['API_NO.', 'Operator_Name_Number',
        'Lease_Name', 'Well', 'District', 'County', 'Wellbore_Profile',
        'Filing_Purpose', 'Amend', 'Current_Queue', 'Permit_submitted', 'SHALE',
        'Depth_bin'])
