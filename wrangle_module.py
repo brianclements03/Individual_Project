@@ -1,3 +1,4 @@
+from itertools import dropwhile
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -26,53 +27,6 @@ def acquire_permits():
 
 
 
-# def prep_permits(permits):
-#     permits = permits.rename(columns = {'Status Date':'Status_Date',"Status #":"Status","API NO.":'API_NO.','Operator Name/Number':'Operator_Name_Number','Lease Name':'Lease_Name','Well #':'Well','Dist.':'District','Wellbore Profile':'Wellbore_Profile','Filing Purpose':'Filing_Purpose','Total Depth':'Total_Depth','Stacked Lateral Parent Well DP #':'Stacked_Lateral_Parent_Well_DP','Current Queue':'Current_Queue'})
-#     x = permits["Status_Date"].str.replace("Submitted", "").str.replace("Approved", "")
-#     x = x.str.split(n=2, expand=True)
-#     permits["Permit_submitted"] = x[0]
-#     permits["Permit_approved"] = x[1]
-#     permits.Permit_submitted = pd.to_datetime(permits.Permit_submitted)
-#     permits.Permit_approved = pd.to_datetime(permits.Permit_approved)
-#     permits['Approval_time_days'] = (permits.Permit_approved - permits.Permit_submitted).astype(str)
-#     # 
-#     x = permits['Approval_time_days'].str.split(n=2, expand=True)
-#     permits["Approval_time_days"] = x[0].astype(int)
-#     # 
-#     shales = pd.read_excel('tx_shales_and_counties.xlsx')
-#     permits = permits.merge(shales, how='left', left_on='County', right_on='COUNTY')
-#     permits = permits.drop(columns = 'COUNTY')
-#     permits = permits.rename(columns = {'SHALE PLAY':'SHALE'})
-#     permits = permits.set_index('Permit_approved').sort_index()
-#     permits = permits.drop(columns = 'Stacked_Lateral_Parent_Well_DP')
-#     permits = permits.dropna()
-
-#     return permits
-
-
-def prep_permits(df):
-    df = df.rename(columns = {'Status Date':'Status_Date',"Status #":"Status","API NO.":'API_NO.','Operator Name/Number':'Operator_Name_Number','Lease Name':'Lease_Name','Well #':'Well','Dist.':'District','Wellbore Profile':'Wellbore_Profile','Filing Purpose':'Filing_Purpose','Total Depth':'Total_Depth','Stacked Lateral Parent Well DP #':'Stacked_Lateral_Parent_Well_DP','Current Queue':'Current_Queue'})
-    x = df["Status_Date"].str.replace("Submitted", "").str.replace("Approved", "")
-    x = x.str.split(n=2, expand=True)
-    df["Permit_submitted"] = x[0]
-    df["Permit_approved"] = x[1]
-    df.Permit_submitted = pd.to_datetime(df.Permit_submitted)
-    df.Permit_approved = pd.to_datetime(df.Permit_approved)
-    df['Approval_time_days'] = (df.Permit_approved - df.Permit_submitted).astype(str)
-    x = df['Approval_time_days'].str.split(n=2, expand=True)
-    df["Approval_time_days"] = x[0].astype(int)
-    shales = pd.read_excel('tx_shales_and_counties.xlsx')
-    df = df.merge(shales, how='left', left_on='County', right_on='COUNTY')
-    df = df.drop(columns = 'COUNTY')
-    df = df.rename(columns = {'SHALE PLAY':'SHALE'})
-    df = df.set_index('Permit_approved').sort_index()
-    df = df.drop(columns = 'Stacked_Lateral_Parent_Well_DP')
-    df = df.dropna()
-
-    return df
-
-
-
 def remove_outliers(df, k, col_list):
     ''' 
     
@@ -94,6 +48,34 @@ def remove_outliers(df, k, col_list):
         df = df[(df[col] > lower_bound) & (df[col] < upper_bound)]
         
     return df
+
+
+def prep_permits(df):
+    df = df.rename(columns = {'Status Date':'Status_Date',"Status #":"Status","API NO.":'API_NO.','Operator Name/Number':'Operator_Name_Number','Lease Name':'Lease_Name','Well #':'Well','Dist.':'District','Wellbore Profile':'Wellbore_Profile','Filing Purpose':'Filing_Purpose','Total Depth':'Total_Depth','Stacked Lateral Parent Well DP #':'Stacked_Lateral_Parent_Well_DP','Current Queue':'Current_Queue'})
+    x = df["Status_Date"].str.replace("Submitted", "").str.replace("Approved", "")
+    x = x.str.split(n=2, expand=True)
+    df["Permit_submitted"] = x[0]
+    df["Permit_approved"] = x[1]
+    df.Permit_submitted = pd.to_datetime(df.Permit_submitted)
+    df.Permit_approved = pd.to_datetime(df.Permit_approved)
+    df['Approval_time_days'] = (df.Permit_approved - df.Permit_submitted).astype(str)
+    x = df['Approval_time_days'].str.split(n=2, expand=True)
+    df["Approval_time_days"] = x[0].astype(int)
+    shales = pd.read_excel('tx_shales_and_counties.xlsx')
+    df = df.merge(shales, how='left', left_on='County', right_on='COUNTY')
+    df = df.drop(columns = 'COUNTY')
+    df = df.rename(columns = {'SHALE PLAY':'SHALE'})
+    df = df.set_index('Permit_approved').sort_index()
+    df = df.drop(columns = 'Stacked_Lateral_Parent_Well_DP')
+    df['Depth_bin']=pd.qcut(df.Total_Depth,3,labels=['Shallow','Mid_depth','Deep'])
+    df = remove_outliers(df,1.5,['Approval_time_days'])
+    df = df.dropna()
+
+    return df
+
+
+
+
 
 
 def split_permits(df):
@@ -146,18 +128,31 @@ def scale_permits(train, validate, test):
     # 1. create the object
     scaler = sklearn.preprocessing.MinMaxScaler()
     # 2. fit the object
-    scaler.fit(train[['Total_Depth', 'Approval_time_days']])
+    scaler.fit(train[['Total_Depth']])
     # 3. use the object. Scale all columns for now
-    train_scaled =  scaler.transform(train[['Total_Depth', 'Approval_time_days']])
-    train_scaled = pd.DataFrame(train_scaled, columns=['Total_Depth', 'Approval_time_days'])
+    # train_scaled_df =  scaler.transform(train[['Total_Depth', 'Approval_time_days']])
+    # train_scaled_df = pd.DataFrame(train_scaled_df, columns=['Total_Depth', 'Approval_time_days'])
+    # train_scaled = pd.concat([train,train_scaled_df], axis = 0)
 
-    validate_scaled =  scaler.transform(validate[['Total_Depth', 'Approval_time_days']])
-    validate_scaled = pd.DataFrame(validate_scaled, columns=['Total_Depth', 'Approval_time_days'])
+    train['Depth_scaled'] = scaler.transform(train[['Total_Depth']])
+    # train['Approval_time_scaled'] = scaler.transform(train[['Approval_time_days']])
+    train_scaled = train.drop(columns = ['Total_Depth'])
 
-    test_scaled =  scaler.transform(test[['Total_Depth', 'Approval_time_days']])
-    test_scaled = pd.DataFrame(test_scaled, columns=['Total_Depth', 'Approval_time_days'])
+    validate['Depth_scaled'] = scaler.transform(validate[['Total_Depth']])
+    # train['Approval_time_scaled'] = scaler.transform(train[['Approval_time_days']])
+    validate_scaled = validate.drop(columns = ['Total_Depth'])
 
-    # 4. Divide into x/y
+    test['Depth_scaled'] = scaler.transform(test[['Total_Depth']])
+    # train['Approval_time_scaled'] = scaler.transform(train[['Approval_time_days']])
+    test_scaled = test.drop(columns = ['Total_Depth'])
+
+    # validate_scaled =  scaler.transform(validate[['Total_Depth', 'Approval_time_days']])
+    # validate_scaled = pd.DataFrame(validate_scaled, columns=['Total_Depth', 'Approval_time_days'])
+
+    # test_scaled =  scaler.transform(test[['Total_Depth', 'Approval_time_days']])
+    # test_scaled = pd.DataFrame(test_scaled, columns=['Total_Depth', 'Approval_time_days'])
+
+    # # 4. Divide into x/y
 
     X_train_scaled = train_scaled.drop(columns=['Approval_time_days'])
     y_train_scaled = pd.DataFrame(train_scaled.Approval_time_days, columns=['Approval_time_days'])
@@ -176,7 +171,7 @@ def wrangle_df():
     df = acquire_permits()
     df = prep_permits(df)
     # 
-    df = remove_outliers(df, 1.5, ['Approval_time_days'])
+    # df = remove_outliers(df, 1.5, ['Approval_time_days'])
     # 
     train, validate, test, X_train, y_train, X_validate, y_validate, X_test, y_test = split_permits(df)
     # 
