@@ -12,6 +12,6 @@ from configparser import SectionProxy
 
 - code comments for py files
 
-- stash a little more code in fils.  viz?
-
 - make reproduction a little easier
+
+- recheck the value_counts on approval times, something is up with the outlier function...

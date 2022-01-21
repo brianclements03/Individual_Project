@@ -39,7 +39,7 @@ https://trello.com/b/cDu1voQa
 
 ## Project Goals
 
-The ultimate goal of this project is to build a model that predicts amount of time a permit takes to be approved; however, there is considerable doubt as to the potential predictive power of such a model, and this goal may shift as my data exploration evolves.
+The ultimate goal of this project is to build a model that predicts amount of time a permit takes to be approved; however, there is considerable doubt as to the potential predictive power of such a model, and this goal may shift as my data exploration evolves. An equally important goal, then, is a thorough exploration of the data in search of any relationship that might be found.
 
 ## Initial Questions
 
