@@ -51,15 +51,13 @@ The ultimate goal of this project is to build a model that predicts amount of ti
 
 ##  Steps to Reproduce
 
-In  the case of this project, the first step is to download the pertinent .csv files (with the correct parameters); from here, I have created several python files that can be used to aggregate, clean, prepare and otherwise manipulate the data in advance of exploration, feature selection, and modeling (listed below).
-
-I split the data into X_train and y_train data sets for much of the exploration and modelling, and was cognizant of the independence of the target variable from other variables in the dataset.  I added a couple of features of my own, including time to approval, and dropped rows with null values.
-
-Once the data is correctly prepared, it can be run through the sklearn preprocessing feature for polynomial regressiong and fit on the scaled X_train dataset.  This provided me with the best results for the purposes of my project.
+In  the case of this project, the first step is to download the pertinent .csv files (with the correct parameters); from here, all the required splits for the study can easily be created using the "wrangle" function in the wrangle_module.py file.  Most other visuals, statistical testing, and modelling that was done was acheived using self-defined functions that can be found in the list of .py files below.
 
 LIST OF MODULES USED IN THE PROJECT, FOUND IN THE PROJECT DIRECTORY:
 -- wrangle_module.py: for acquiring, cleaning, encoding, splitting and scaling the data.  
 -- model.py: many, many different versions of the data were used in different feature selection and modeling algorithms; this module is helpful for splitting them up neatly.
+-- viz.py: visuals with long code
+-- hypothesis_testing: long code related to stats testing
 
 
 ## Data Dictionary
@@ -114,13 +112,10 @@ Variables created in the notebook (explanation where it helps for clarity):
 - y_test : y split of test
 - train_scaled : train with scaled continuous attributes
 - X_train_scaled : X_train with scaled attributes
-<!-- - y_train_scaled -->
 - validate_scaled : validate with scaled continuous attributes
 - X_validate_scaled : X_validate with scaled attributes
-<!-- - y_validate_scaled -->
 - test_scaled : test with scaled continuous attributes
 - X_test_scaled : X_test with scaled attributes
-<!-- - y_test_scaled -->
 - disc_vars : discrete variable
 - temp : temporary dataframe
 - quick_counties : list of counties that approve permits quickly
