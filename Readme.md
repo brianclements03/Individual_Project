@@ -46,6 +46,7 @@ The ultimate goal of this project is to build a model that predicts amount of ti
 - Do certain leases get approval faster? Or in certain counties/districts/shales?
 - What's the relation between well depth and shale/county/district?  Approval time? 
 - Which district approves its permits the fastest?
+- Is there a trend over time?
 
 
 ##  Steps to Reproduce

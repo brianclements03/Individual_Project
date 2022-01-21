@@ -292,3 +292,76 @@ def get_rmse_in_sample(y_train,y_validate):
 
     print("RMSE using Mean\nTrain/In-Sample: ", round(rmse_train, 4), 
           "\nValidate/Out-of-Sample: ", round(rmse_validate, 4))
+    return rmse_train, rmse_validate
+
+
+def create_eval_df(rmse_train, rmse_validate):
+    '''
+    function to create an empty df to add evaluation metrics to as models are built
+    '''
+    metric_df = pd.DataFrame(data=[
+            {
+                'model': 'mean_baseline', 
+                'RMSE_train': rmse_train,
+                'RMSE_validate': rmse_validate
+                }
+            ])
+    return metric_df
+
+
+def create_polynomial_features_deg3(X_train_df,X_validate_df,X_test_df):
+    '''
+    function to create polynomial features for running model on the different X_ sets
+    '''
+    # import from sklearn to create polynomial features for running the model on test
+    from sklearn.preprocessing import PolynomialFeatures
+
+    # Make the polynomial features to get a new set of features. import from sklearn
+    pf = PolynomialFeatures(degree=3)
+
+    # Fit and transform X_train_model (which is scaled)
+    X_train_degree3 = pf.fit_transform(X_train_df)
+
+    # Transform X_validate_model & X_test_model
+    X_validate_degree3 = pf.transform(X_validate_df)
+    X_test_degree3 =  pf.transform(X_test_df)
+    
+    return X_train_degree3, X_validate_degree3, X_test_degree3
+
+
+
+def create_polynomial_model_object(X_test_degree3, y_test, metric_df):
+    '''
+    Function to create the polynomial model object, add the target prediction to the y_test dataframe, and define and print the rmse of the model on the test set
+    '''
+    # Create the model object
+    lm2 = LinearRegression()
+
+    # Fit the model to our test data. 
+    lm2.fit(X_test_degree3, y_test.Approval_time_days)
+
+    # Create a column in the y_test dataframe to hold the polynomial regression prediction:
+    y_test['Approval_time_pred_lm2'] = lm2.predict(X_test_degree3)
+
+    # Evaluate by calculating its RMSE on test
+    rmse_test = mean_squared_error(y_test.Approval_time_days, y_test.Approval_time_pred_lm2) ** (1/2)
+    # A statement reminding us of the RMSE on the train and validate samples:
+    print("RMSE for Polynomial Model, degrees=3\nTraining/In-Sample: ", metric_df.RMSE_train.iloc[5], 
+          "\nValidation/Out-of-Sample: ", metric_df.RMSE_validate.iloc[5],)
+    
+    return y_test, rmse_test
+
+def graph_rmse_distribution(y_test):
+    # create a line representing no error
+    plt.axhline(label="No Error")
+    # plot approval times vs predicted approval times, with color and transparency defined
+    plt.scatter(y_test.Approval_time_days, y_test.Approval_time_pred_lm2 - y_test.Approval_time_days,\
+                alpha=.5, color="red", s=100, label="Model: Polynomial Regression, Deg = 3")
+    # assign a legend
+    plt.legend()
+    # label the axes
+    plt.xlabel("Actual Approval Time")
+    plt.ylabel("Predicted Approval Time - Actual Approval Time")
+    # give the chart a title
+    plt.title("RMSE distribution on Test data--How 'wrong' the model was")
+    plt.show()
