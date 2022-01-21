@@ -267,3 +267,28 @@ def run_all_models(X_train_model, y_train, X_validate_model, y_validate, X_test_
     metric_df = polynomial_regression_deg_3(X_train_model, y_train, X_validate_model, y_validate, X_test_model, metric_df)
 
     return metric_df
+
+
+def add_pred_mean(y_train,y_validate,y_test):
+    '''
+    Add baseline prediction to all y_ datasets for evaluation purposes
+    '''
+    approval_time_pred_mean = y_train.Approval_time_days.mean()
+    y_train['Approval_time_pred_mean'] = round(approval_time_pred_mean, 6)
+    y_validate['Approval_time_pred_mean'] = round(approval_time_pred_mean,6)
+    y_test['Approval_time_pred_mean'] = round(approval_time_pred_mean,6)
+    return y_train,y_validate,y_test
+
+
+def get_rmse_in_sample(y_train,y_validate):
+    '''
+    Function to return a printed statement of rmse for the train and validate sets
+    '''
+    from sklearn.metrics import mean_squared_error
+
+    rmse_train = mean_squared_error(y_train.Approval_time_days,
+                                    y_train.Approval_time_pred_mean) ** .5
+    rmse_validate = mean_squared_error(y_validate.Approval_time_days, y_validate.Approval_time_pred_mean) ** (0.5)
+
+    print("RMSE using Mean\nTrain/In-Sample: ", round(rmse_train, 4), 
+          "\nValidate/Out-of-Sample: ", round(rmse_validate, 4))
