@@ -204,3 +204,11 @@ def anova2(df):
     )
 
     return f,p
+
+
+def depth_and_approval_time(df):
+    depth_bins = ['Shallow', 'Deep', 'Mid_depth']
+    for i in depth_bins:
+        output = df[df.Depth_bin == i].Approval_time_days.mean()
+        print(f'{i} well avg approval time is {output}')
+    print(f'Overall avg approval time is {df.Approval_time_days.mean()}')

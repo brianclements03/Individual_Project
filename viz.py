@@ -47,3 +47,23 @@ def tsa_resampling(df):
     y.resample('M').mean().plot(label='Montly')
     y.resample('Y').mean().plot(label='Yearly')
     plt.legend()
+
+
+def shale_vs_depth(df):
+    plt.figure(figsize=(4,3))
+    sns.barplot(data=df,x='SHALE',y='Total_Depth')
+    mean = df.Total_Depth.mean()
+    plt.axhline(y=mean, label='average depth')
+    plt.xticks(rotation=45)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+    plt.show
+
+
+def approval_time_by_district(df):
+    # a seaborn barplot of the approval times by district
+    sns.barplot(data=df,x='District',y='Approval_time_days')
+    mean = df.Approval_time_days.mean()
+    plt.axhline(y=mean, label='average approval time')
+    plt.xticks(rotation=45)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+    plt.show
