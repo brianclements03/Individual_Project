@@ -1,3 +1,4 @@
+# imports, some redundant, that i will need to run my functions
 import pandas as pd
 import numpy as np
 import os
@@ -41,6 +42,7 @@ def create_data_for_models(X_train_scaled, X_validate_scaled, X_test_scaled):
     single continuous feature in the data set.
     
     '''
+    # drop columns not going into the modeling dataframe
     X_train_model = X_train_scaled.drop(columns = ['API_NO.', 'Operator_Name_Number',
        'Lease_Name', 'Well', 'District', 'County', 'Wellbore_Profile',
        'Filing_Purpose', 'Amend', 'Current_Queue', 'Permit_submitted', 'SHALE',
@@ -53,8 +55,7 @@ def create_data_for_models(X_train_scaled, X_validate_scaled, X_test_scaled):
        'Lease_Name', 'Well', 'District', 'County', 'Wellbore_Profile',
        'Filing_Purpose', 'Amend', 'Current_Queue', 'Permit_submitted', 'SHALE',
        'Depth_bin'])
-
-
+    # return the dataframes for calling in notebook
     return X_train_model, X_validate_model, X_test_model
 
 
@@ -63,34 +64,29 @@ def create_data_for_models(X_train_scaled, X_validate_scaled, X_test_scaled):
 def run_ols_model(X_train_model, y_train, X_validate_model, y_validate, metric_df):
     '''
     Function that runs the ols model on the data
-    
     '''
-
+    # import the sklearn function for mean squared error
     from sklearn.metrics import mean_squared_error
     # create the model object
     lm = LinearRegression()
-    # fit the model to our training data. We must specify the column in y_train, 
-    # since we have converted it to a dataframe from a series! 
+    # fit the model to our training data.
     lm.fit(X_train_model, y_train.Approval_time_days)
-    # predict train
+    # predict train--add ols prediction column to y_train
     y_train['Approval_time_pred_lm'] = lm.predict(X_train_model)
-    # evaluate: rmse
+    # evaluate: rmse of the model on train
     rmse_train = mean_squared_error(y_train.Approval_time_days, y_train.Approval_time_pred_lm) ** .5
-    # predict validate
+    # predict validate--add ols prediction column to y_validate
     y_validate['Approval_time_pred_lm'] = lm.predict(X_validate_model)
 
-    # evaluate: rmse
+    # evaluate: rmse of the model on validate
     rmse_validate = mean_squared_error(y_validate.Approval_time_days, y_validate.Approval_time_pred_lm) ** (0.5)
-    
+    # append the results to the metric_df dataframe
     metric_df = metric_df.append({
         'model': 'OLS Regressor', 
         'RMSE_train': rmse_train,
         'RMSE_validate': rmse_validate,
         }, ignore_index=True)
-
-    # print("RMSE for OLS using LinearRegression\nTraining/In-Sample: ", rmse_train, 
-    #     "\nValidation/Out-of-Sample: ", rmse_validate)
-
+    # return the metric_df for calling in notebook
     return metric_df
 
 
@@ -102,32 +98,25 @@ def lasso_lars(X_train_model, y_train, X_validate_model, y_validate, metric_df):
     Function that runs the lasso lars model on the data
     
     '''
-
-    # a good balance is a low rmse and a low difference
-
+    # define the lasso lars object, including alpha
     lars = LassoLars(alpha= 1)
-
-    # fit the model to our training data. We must specify the column in y_train, 
-    # since we have converted it to a dataframe from a series!
+    # fit the model to the training data.
     lars.fit(X_train_model, y_train.Approval_time_days)
-
-    # predict train
+    # predict train--add lasso prediction column to y_train
     y_train['Approval_time_pred_lars'] = lars.predict(X_train_model)
-
-    # evaluate: rmse
+    # evaluate: rmse for train
     rmse_train = mean_squared_error(y_train.Approval_time_days, y_train.Approval_time_pred_lars) ** (1/2)
-
-    # predict validate
+    # predict validateadd lasso prediction column to y_validate
     y_validate['Approval_time_pred_lars'] = lars.predict(X_validate_model)
-
-    # evaluate: rmse
+    # evaluate: rmse for validate
     rmse_validate = mean_squared_error(y_validate.Approval_time_days, y_validate.Approval_time_pred_lars) ** (1/2)
+    # appende results to the metric_df
     metric_df = metric_df.append({
         'model': 'Lasso_alpha1', 
         'RMSE_train': rmse_train,
         'RMSE_validate': rmse_validate,
         }, ignore_index=True)
-    
+    # return the metric_df for calling in notebook
     return metric_df
 
 
@@ -136,121 +125,92 @@ def lasso_lars(X_train_model, y_train, X_validate_model, y_validate, metric_df):
 
 
 def tweedie(X_train_model, y_train, X_validate_model, y_validate, metric_df):
-
     '''
     Function that runs the tweedie model on the data
-    
     '''
-
 # as seen in curriculum, the power ought to be set per distribution type
 # power = 0 is same as OLS
-
+    # creat the tweedie (aka glm) object
     glm = TweedieRegressor(power=1.4, alpha=0)
-
-
-    # fit the model to our training data. We must specify the column in y_train, 
-    # since we have converted it to a dataframe from a series! 
+    # fit the model to the training data. 
     glm.fit(X_train_model, y_train.Approval_time_days)
-
-    # predict train
+    # predict train--add lasso prediction column to y_train
     y_train['Approval_time_pred_glm'] = glm.predict(X_train_model)
-
-    # evaluate: rmse
+    # evaluate: rmse on train
     rmse_train = mean_squared_error(y_train.Approval_time_days, y_train.Approval_time_pred_glm) ** (1/2)
-
-    # predict validate
+    # predict validate--add lasso prediction column to y_validate
     y_validate['Approval_time_pred_glm'] = glm.predict(X_validate_model)
-
-    # evaluate: rmse
+    # evaluate: rmse on validate
     rmse_validate = mean_squared_error(y_validate.Approval_time_days, y_validate.Approval_time_pred_glm) ** (1/2)
-
+    # append to metric_df
     metric_df = metric_df.append({
         'model': 'glm_compound', 
         'RMSE_train': rmse_train,
         'RMSE_validate': rmse_validate,
         }, ignore_index=True)
+    # return metric_df for calling later
     return metric_df
 
 def polynomial_regression_deg_2(X_train_model, y_train, X_validate_model, y_validate, X_test_model, metric_df):
     '''
     Function that runs the polynomial model on the data
-    
     '''    
-        
-        # make the polynomial features to get a new set of features. import from sklearn
+    # make the polynomial features to get a new set of features. import from sklearn. defining degress = 2
     pf = PolynomialFeatures(degree=2)
-
     # fit and transform X_train_scaled
     X_train_degree2 = pf.fit_transform(X_train_model)
-
-    # transform X_validate_scaled & X_test_scaled
+    # transform X_validate_scaled
     X_validate_degree2 = pf.transform(X_validate_model)
-    X_test_degree2 =  pf.transform(X_test_model)
     # create the model object
     lm2 = LinearRegression()
-
-    # fit the model to our training data. We must specify the column in y_train, 
-    # since we have converted it to a dataframe from a series! 
+    # fit the model to the training data.
     lm2.fit(X_train_degree2, y_train.Approval_time_days)
-
-    # predict train
+    # predict train--add lasso prediction column to y_train
     y_train['Approval_time_pred_lm2'] = lm2.predict(X_train_degree2)
-
-    # evaluate: rmse
+    # evaluate: rmse on train
     rmse_train = mean_squared_error(y_train.Approval_time_days, y_train.Approval_time_pred_lm2) ** (1/2)
-
-    # predict validate
+    # predict validate--add lasso prediction column to y_validate
     y_validate['Approval_time_pred_lm2'] = lm2.predict(X_validate_degree2)
-
-    # evaluate: rmse
+    # evaluate: rmse on validate
     rmse_validate = mean_squared_error(y_validate.Approval_time_days, y_validate.Approval_time_pred_lm2) ** 0.5
-
+    # append results to metric_df
     metric_df = metric_df.append({
     'model': 'quadratic_deg2', 
     'RMSE_train': rmse_train,
     'RMSE_validate': rmse_validate,
     }, ignore_index=True)
+    #return the metric_df for calling later
     return metric_df
 
 def polynomial_regression_deg_3(X_train_model, y_train, X_validate_model, y_validate, X_test_model, metric_df):
     '''
     Function that runs the polynomial model on the data
-    
-    '''    
-        
-        # make the polynomial features to get a new set of features. import from sklearn
+    '''        
+    # make the polynomial features to get a new set of features. import from sklearn. defining degress = 3
     pf = PolynomialFeatures(degree=3)
-
     # fit and transform X_train_scaled
     X_train_degree3 = pf.fit_transform(X_train_model)
-
     # transform X_validate_scaled & X_test_scaled
     X_validate_degree3 = pf.transform(X_validate_model)
-    X_test_degree3 =  pf.transform(X_test_model)
     # create the model object
     lm2 = LinearRegression()
-
-    # fit the model to our training data. We must specify the column in y_train, 
-    # since we have converted it to a dataframe from a series! 
+    # fit the model to the training data.
     lm2.fit(X_train_degree3, y_train.Approval_time_days)
-
-    # predict train
+    # predict train--add lasso prediction column to y_train
     y_train['Approval_time_pred_lm2'] = lm2.predict(X_train_degree3)
-
-    # evaluate: rmse
+    # evaluate: rmse on train
     rmse_train = mean_squared_error(y_train.Approval_time_days, y_train.Approval_time_pred_lm2) ** (1/2)
-
-    # predict validate
+    # predict validate--add lasso prediction column to y_validate
     y_validate['Approval_time_pred_lm2'] = lm2.predict(X_validate_degree3)
-
-    # evaluate: rmse
+    # evaluate: rmse on validate
     rmse_validate = mean_squared_error(y_validate.Approval_time_days, y_validate.Approval_time_pred_lm2) ** 0.5
-
+    # append results to the metric_df
     metric_df = metric_df.append({
     'model': 'quadratic_deg3', 
     'RMSE_train': rmse_train,
     'RMSE_validate': rmse_validate,
     }, ignore_index=True)
+    # return result to call later
     return metric_df
 
 
@@ -258,14 +218,14 @@ def polynomial_regression_deg_3(X_train_model, y_train, X_validate_model, y_vali
 def run_all_models(X_train_model, y_train, X_validate_model, y_validate, X_test_model, metric_df):
     '''
     Function that runs all the above modeling function at the same time and returns a metric dataframe for comparison
-    
     '''
+    # call each and every of the above models so as to run them in one fell swoop.  ease of reproducibility
     metric_df = run_ols_model(X_train_model, y_train, X_validate_model, y_validate, metric_df)
     metric_df = lasso_lars(X_train_model, y_train, X_validate_model, y_validate, metric_df)
     metric_df = tweedie(X_train_model, y_train, X_validate_model, y_validate, metric_df)
     metric_df = polynomial_regression_deg_2(X_train_model, y_train, X_validate_model, y_validate, X_test_model, metric_df)
     metric_df = polynomial_regression_deg_3(X_train_model, y_train, X_validate_model, y_validate, X_test_model, metric_df)
-
+    # return the resulting metric_df
     return metric_df
 
 
@@ -273,10 +233,13 @@ def add_pred_mean(y_train,y_validate,y_test):
     '''
     Add baseline prediction to all y_ datasets for evaluation purposes
     '''
+    # define the approval time prediction using mean
     approval_time_pred_mean = y_train.Approval_time_days.mean()
+    # append this as a new column in the three y_ datasets
     y_train['Approval_time_pred_mean'] = round(approval_time_pred_mean, 6)
     y_validate['Approval_time_pred_mean'] = round(approval_time_pred_mean,6)
     y_test['Approval_time_pred_mean'] = round(approval_time_pred_mean,6)
+    # return for calling in the notebook
     return y_train,y_validate,y_test
 
 
@@ -284,14 +247,17 @@ def get_rmse_in_sample(y_train,y_validate):
     '''
     Function to return a printed statement of rmse for the train and validate sets
     '''
+    # import mse from sklearn library
     from sklearn.metrics import mean_squared_error
-
+    # defing the rmse for train
     rmse_train = mean_squared_error(y_train.Approval_time_days,
                                     y_train.Approval_time_pred_mean) ** .5
+    # and for validate
     rmse_validate = mean_squared_error(y_validate.Approval_time_days, y_validate.Approval_time_pred_mean) ** (0.5)
-
+    # print statement showing the values of the above two variables
     print("RMSE using Mean\nTrain/In-Sample: ", round(rmse_train, 4), 
           "\nValidate/Out-of-Sample: ", round(rmse_validate, 4))
+    # return the above-defined variables for calling/assignment in the notebook
     return rmse_train, rmse_validate
 
 
@@ -299,6 +265,7 @@ def create_eval_df(rmse_train, rmse_validate):
     '''
     function to create an empty df to add evaluation metrics to as models are built
     '''
+    # create a df that holds the rmse for train and validate, which were created in a previous function
     metric_df = pd.DataFrame(data=[
             {
                 'model': 'mean_baseline', 
@@ -306,6 +273,7 @@ def create_eval_df(rmse_train, rmse_validate):
                 'RMSE_validate': rmse_validate
                 }
             ])
+    # return the metric_df to call in notebook
     return metric_df
 
 
@@ -313,19 +281,17 @@ def create_polynomial_features_deg3(X_train_df,X_validate_df,X_test_df):
     '''
     function to create polynomial features for running model on the different X_ sets
     '''
+    # take note of the variables the function is asking for: these are generic--in my notebook, the entry will be X_train_model, X_validate_model,X_test_model
     # import from sklearn to create polynomial features for running the model on test
     from sklearn.preprocessing import PolynomialFeatures
-
-    # Make the polynomial features to get a new set of features. import from sklearn
+    # Make the polynomial features to get a new set of features. import from sklearn. defining degrees = 3
     pf = PolynomialFeatures(degree=3)
-
     # Fit and transform X_train_model (which is scaled)
     X_train_degree3 = pf.fit_transform(X_train_df)
-
     # Transform X_validate_model & X_test_model
     X_validate_degree3 = pf.transform(X_validate_df)
     X_test_degree3 =  pf.transform(X_test_df)
-    
+    # return the resulting dfs for calling in notebook
     return X_train_degree3, X_validate_degree3, X_test_degree3
 
 
@@ -336,19 +302,16 @@ def create_polynomial_model_object(X_test_degree3, y_test, metric_df):
     '''
     # Create the model object
     lm2 = LinearRegression()
-
     # Fit the model to our test data. 
     lm2.fit(X_test_degree3, y_test.Approval_time_days)
-
     # Create a column in the y_test dataframe to hold the polynomial regression prediction:
     y_test['Approval_time_pred_lm2'] = lm2.predict(X_test_degree3)
-
     # Evaluate by calculating its RMSE on test
     rmse_test = mean_squared_error(y_test.Approval_time_days, y_test.Approval_time_pred_lm2) ** (1/2)
     # A statement reminding us of the RMSE on the train and validate samples:
     print("RMSE for Polynomial Model, degrees=3\nTraining/In-Sample: ", metric_df.RMSE_train.iloc[5], 
           "\nValidation/Out-of-Sample: ", metric_df.RMSE_validate.iloc[5],)
-    
+    # return the resulting df and variable for calling
     return y_test, rmse_test
 
 def graph_rmse_distribution(y_test):
