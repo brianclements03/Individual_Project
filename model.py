@@ -55,6 +55,13 @@ def create_data_for_models(X_train_scaled, X_validate_scaled, X_test_scaled):
        'Lease_Name', 'Well', 'District', 'County', 'Wellbore_Profile',
        'Filing_Purpose', 'Amend', 'Current_Queue', 'Permit_submitted', 'SHALE',
        'Depth_bin'])
+    # return the dataframes for calling in notebook
+    return X_train_model, X_validate_model, X_test_model
+
+def create_features(X_train_model, X_validate_model, X_test_model):
+    '''
+    Same function as above, but to create the kbest and rfe dfs
+    '''
     X_train_kbest = X_train_model.drop(columns = ['SHALE_BARNETT', 'SHALE_HAYNESVILLE', 'SHALE_NONE', 'District_02', 'District_03',
        'District_04', 'District_05', 'District_06',
        'District_09', 'District_10', 'District_7B', 'District_7C',
@@ -82,10 +89,8 @@ def create_data_for_models(X_train_scaled, X_validate_scaled, X_test_scaled):
         'District_04', 'District_08',
         'District_09', 'District_10', 'District_7B', 'District_7C',
         'District_8A', 'Depth_scaled'])
-    # return the dataframes for calling in notebook
-    return X_train_model, X_validate_model, X_test_model, X_train_kbest, X_validate_kbest, X_test_kbest, X_train_rfe, X_validate_rfe, X_test_rfe
-
-
+    # return the results
+    return X_train_kbest, X_validate_kbest, X_test_kbest, X_train_rfe, X_validate_rfe, X_test_rfe
 
 
 def run_ols_model(X_train_model, y_train, X_validate_model, y_validate, metric_df, features_description):
