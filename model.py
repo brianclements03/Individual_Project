@@ -55,13 +55,40 @@ def create_data_for_models(X_train_scaled, X_validate_scaled, X_test_scaled):
        'Lease_Name', 'Well', 'District', 'County', 'Wellbore_Profile',
        'Filing_Purpose', 'Amend', 'Current_Queue', 'Permit_submitted', 'SHALE',
        'Depth_bin'])
+    X_train_kbest = X_train_model.drop(columns = ['SHALE_BARNETT', 'SHALE_HAYNESVILLE', 'SHALE_NONE', 'District_02', 'District_03',
+       'District_04', 'District_05', 'District_06',
+       'District_09', 'District_10', 'District_7B', 'District_7C',
+       'District_8A', 'Depth_scaled'])
+    X_validate_kbest = X_validate_model.drop(columns = ['SHALE_BARNETT', 'SHALE_HAYNESVILLE', 'SHALE_NONE', 'District_02', 'District_03',
+        'District_04', 'District_05', 'District_06',
+        'District_09', 'District_10', 'District_7B', 'District_7C',
+        'District_8A', 'Depth_scaled'])
+    X_test_kbest = X_test_model.drop(columns = ['SHALE_BARNETT', 'SHALE_HAYNESVILLE', 'SHALE_NONE', 'District_02', 'District_03',
+        'District_04', 'District_05', 'District_06',
+        'District_09', 'District_10', 'District_7B', 'District_7C',
+        'District_8A', 'Depth_scaled'])
+    X_train_rfe = X_train_model.drop(columns = ['SHALE_BARNETT', 'SHALE_EAGLE FORD', 'SHALE_HAYNESVILLE', 'SHALE_NONE',
+       'SHALE_PERMIAN BASIN', 'District_03',
+       'District_04', 'District_08',
+       'District_09', 'District_10', 'District_7B', 'District_7C',
+       'District_8A', 'Depth_scaled'])
+    X_validate_rfe = X_validate_model.drop(columns = ['SHALE_BARNETT', 'SHALE_EAGLE FORD', 'SHALE_HAYNESVILLE', 'SHALE_NONE',
+        'SHALE_PERMIAN BASIN', 'District_03',
+        'District_04', 'District_08',
+        'District_09', 'District_10', 'District_7B', 'District_7C',
+        'District_8A', 'Depth_scaled'])
+    X_test_rfe = X_test_model.drop(columns = ['SHALE_BARNETT', 'SHALE_EAGLE FORD', 'SHALE_HAYNESVILLE', 'SHALE_NONE',
+        'SHALE_PERMIAN BASIN', 'District_03',
+        'District_04', 'District_08',
+        'District_09', 'District_10', 'District_7B', 'District_7C',
+        'District_8A', 'Depth_scaled'])
     # return the dataframes for calling in notebook
-    return X_train_model, X_validate_model, X_test_model
+    return X_train_model, X_validate_model, X_test_model, X_train_kbest, X_validate_kbest, X_test_kbest, X_train_rfe, X_validate_rfe, X_test_rfe
 
 
 
 
-def run_ols_model(X_train_model, y_train, X_validate_model, y_validate, metric_df):
+def run_ols_model(X_train_model, y_train, X_validate_model, y_validate, metric_df, features_description):
     '''
     Function that runs the ols model on the data
     '''
@@ -82,7 +109,7 @@ def run_ols_model(X_train_model, y_train, X_validate_model, y_validate, metric_d
     rmse_validate = mean_squared_error(y_validate.Approval_time_days, y_validate.Approval_time_pred_lm) ** (0.5)
     # append the results to the metric_df dataframe
     metric_df = metric_df.append({
-        'model': 'OLS Regressor', 
+        'model': 'OLS Regressor ' + features_description, 
         'RMSE_train': rmse_train,
         'RMSE_validate': rmse_validate,
         }, ignore_index=True)
@@ -93,7 +120,7 @@ def run_ols_model(X_train_model, y_train, X_validate_model, y_validate, metric_d
 
 
 
-def lasso_lars(X_train_model, y_train, X_validate_model, y_validate, metric_df):
+def lasso_lars(X_train_model, y_train, X_validate_model, y_validate, metric_df, features_description):
     '''
     Function that runs the lasso lars model on the data
     
@@ -112,7 +139,7 @@ def lasso_lars(X_train_model, y_train, X_validate_model, y_validate, metric_df):
     rmse_validate = mean_squared_error(y_validate.Approval_time_days, y_validate.Approval_time_pred_lars) ** (1/2)
     # appende results to the metric_df
     metric_df = metric_df.append({
-        'model': 'Lasso_alpha1', 
+        'model': 'Lasso_alpha1 ' + features_description, 
         'RMSE_train': rmse_train,
         'RMSE_validate': rmse_validate,
         }, ignore_index=True)
@@ -124,7 +151,7 @@ def lasso_lars(X_train_model, y_train, X_validate_model, y_validate, metric_df):
 
 
 
-def tweedie(X_train_model, y_train, X_validate_model, y_validate, metric_df):
+def tweedie(X_train_model, y_train, X_validate_model, y_validate, metric_df, features_description):
     '''
     Function that runs the tweedie model on the data
     '''
@@ -144,14 +171,14 @@ def tweedie(X_train_model, y_train, X_validate_model, y_validate, metric_df):
     rmse_validate = mean_squared_error(y_validate.Approval_time_days, y_validate.Approval_time_pred_glm) ** (1/2)
     # append to metric_df
     metric_df = metric_df.append({
-        'model': 'glm_compound', 
+        'model': 'glm_compound ' + features_description, 
         'RMSE_train': rmse_train,
         'RMSE_validate': rmse_validate,
         }, ignore_index=True)
     # return metric_df for calling later
     return metric_df
 
-def polynomial_regression_deg_2(X_train_model, y_train, X_validate_model, y_validate, X_test_model, metric_df):
+def polynomial_regression_deg_2(X_train_model, y_train, X_validate_model, y_validate, metric_df, features_description):
     '''
     Function that runs the polynomial model on the data
     '''    
@@ -175,14 +202,14 @@ def polynomial_regression_deg_2(X_train_model, y_train, X_validate_model, y_vali
     rmse_validate = mean_squared_error(y_validate.Approval_time_days, y_validate.Approval_time_pred_lm2) ** 0.5
     # append results to metric_df
     metric_df = metric_df.append({
-    'model': 'quadratic_deg2', 
+    'model': 'quadratic_deg2 ' + features_description, 
     'RMSE_train': rmse_train,
     'RMSE_validate': rmse_validate,
     }, ignore_index=True)
     #return the metric_df for calling later
     return metric_df
 
-def polynomial_regression_deg_3(X_train_model, y_train, X_validate_model, y_validate, X_test_model, metric_df):
+def polynomial_regression_deg_3(X_train_model, y_train, X_validate_model, y_validate, metric_df, features_description):
     '''
     Function that runs the polynomial model on the data
     '''        
@@ -206,7 +233,7 @@ def polynomial_regression_deg_3(X_train_model, y_train, X_validate_model, y_vali
     rmse_validate = mean_squared_error(y_validate.Approval_time_days, y_validate.Approval_time_pred_lm2) ** 0.5
     # append results to the metric_df
     metric_df = metric_df.append({
-    'model': 'quadratic_deg3', 
+    'model': 'quadratic_deg3 ' + features_description, 
     'RMSE_train': rmse_train,
     'RMSE_validate': rmse_validate,
     }, ignore_index=True)
@@ -215,16 +242,31 @@ def polynomial_regression_deg_3(X_train_model, y_train, X_validate_model, y_vali
 
 
 
-def run_all_models(X_train_model, y_train, X_validate_model, y_validate, X_test_model, metric_df):
+def run_all_models(X_train_model, X_train_kbest, X_train_rfe, y_train, X_validate_model,X_validate_kbest, X_validate_rfe, y_validate, metric_df):
     '''
     Function that runs all the above modeling function at the same time and returns a metric dataframe for comparison
     '''
     # call each and every of the above models so as to run them in one fell swoop.  ease of reproducibility
-    metric_df = run_ols_model(X_train_model, y_train, X_validate_model, y_validate, metric_df)
-    metric_df = lasso_lars(X_train_model, y_train, X_validate_model, y_validate, metric_df)
-    metric_df = tweedie(X_train_model, y_train, X_validate_model, y_validate, metric_df)
-    metric_df = polynomial_regression_deg_2(X_train_model, y_train, X_validate_model, y_validate, X_test_model, metric_df)
-    metric_df = polynomial_regression_deg_3(X_train_model, y_train, X_validate_model, y_validate, X_test_model, metric_df)
+    #OLS
+    metric_df = run_ols_model(X_train_model, y_train, X_validate_model, y_validate, metric_df, 'all features')
+    metric_df = run_ols_model(X_train_kbest, y_train, X_validate_kbest, y_validate, metric_df, 'k_best')
+    metric_df = run_ols_model(X_train_rfe, y_train, X_validate_rfe, y_validate, metric_df, 'rfe')
+    #LASSO LARS
+    metric_df = lasso_lars(X_train_model, y_train, X_validate_model, y_validate, metric_df, 'all features')
+    metric_df = lasso_lars(X_train_kbest, y_train, X_validate_kbest, y_validate, metric_df, 'k_best')
+    metric_df = lasso_lars(X_train_rfe, y_train, X_validate_rfe, y_validate, metric_df, 'rfe')
+    #TWEEDIE
+    metric_df = tweedie(X_train_model, y_train, X_validate_model, y_validate, metric_df, 'all features')
+    metric_df = tweedie(X_train_kbest, y_train, X_validate_kbest, y_validate, metric_df, 'k_best')
+    metric_df = tweedie(X_train_rfe, y_train, X_validate_rfe, y_validate, metric_df, 'rfe')
+    #POLYNOMIAL DEG2
+    metric_df = polynomial_regression_deg_2(X_train_model, y_train, X_validate_model, y_validate, metric_df, 'all features')
+    metric_df = polynomial_regression_deg_2(X_train_kbest, y_train, X_validate_kbest, y_validate, metric_df, 'k_best')
+    metric_df = polynomial_regression_deg_2(X_train_rfe, y_train, X_validate_rfe, y_validate, metric_df, 'rfe')
+    #POLYNOMIAL DEG3
+    metric_df = polynomial_regression_deg_3(X_train_model, y_train, X_validate_model, y_validate, metric_df, 'all features')
+    metric_df = polynomial_regression_deg_3(X_train_kbest, y_train, X_validate_kbest, y_validate, metric_df, 'k_best')
+    metric_df = polynomial_regression_deg_3(X_train_rfe, y_train, X_validate_rfe, y_validate, metric_df, 'rfe')
     # return the resulting metric_df
     return metric_df
 
@@ -328,3 +370,57 @@ def graph_rmse_distribution(y_test):
     # give the chart a title
     plt.title("RMSE distribution on Test data--How 'wrong' the model was")
     plt.show()
+
+
+def select_kbest(X,y,k):
+    '''
+    Function that returns top k features of a model using k best model,
+    accepting X columns, y columns, and k number of top features.
+    
+    '''
+    # K Best model here:
+
+    from sklearn.feature_selection import SelectKBest, f_regression
+
+    # parameters: f_regression stats test, give me 8 features
+    f_selector = SelectKBest(f_regression, k=k)
+
+    # find the top 8 X's correlated with y
+    f_selector.fit(X, y)
+
+    X_reduced = f_selector.transform(X)
+
+    # boolean mask of whether the column was selected or not. 
+    feature_mask = f_selector.get_support()
+
+    # get list of top K features. 
+    f_feature = X.loc[:,feature_mask].columns.tolist()
+
+    return f_feature
+
+
+
+def select_rfe(X,y,k):
+    '''
+    Function that returns top k features of a model using rfe model,
+    accepting X columns, y columns, and k number of top features.
+    
+    '''
+    from sklearn.linear_model import LinearRegression
+    from sklearn.feature_selection import RFE
+
+    # initialize the ML algorithm
+    lm = LinearRegression()
+
+    # create the rfe object, indicating the ML object (lm) and the number of features I want to end up with. 
+    rfe = RFE(lm, k)
+
+    # fit the data using RFE
+    rfe.fit(X,y)  
+
+    # get the mask of the columns selected
+    feature_mask = rfe.support_
+
+    # get list of the column names. 
+    rfe_feature = X.iloc[:,feature_mask].columns.tolist()
+    return rfe_feature
